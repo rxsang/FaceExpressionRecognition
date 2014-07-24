@@ -40,7 +40,7 @@ class DirProcessing:
         index_sid = index_id.zfill(8)
         
         landmarks_name = "{}_{}_{}_landmarks.txt".format(person_sid, perform_sid, index_sid)
-        landmarks_url = "{}/{}/{}/{}/{}".format(DirProcessing.dataset_root, DirProcessing.label_folder, person_sid, perform_sid, landmarks_name)
+        landmarks_url = "{}/{}/{}/{}/{}".format(DirProcessing.dataset_root, DirProcessing.landmarks_folder, person_sid, perform_sid, landmarks_name)
 
         return landmarks_url
 
@@ -66,3 +66,21 @@ class DirProcessing:
         landmarks_url = DirProcessing.generate_landmarks_url(person_id, perform_id, index_id)
 
         return landmarks_url
+
+    @staticmethod
+    def get_all_imgs_url_from_sequence(person_id, perform_id):
+        person_sid = 'S' + person_id.zfill(3)
+        perform_sid = perform_id.zfill(3)
+        
+        url_list = []
+        while True:
+            img_folder = "{}/{}/{}/{}".format(DirProcessing.dataset_root, DirProcessing.image_folder, person_sid, perform_sid)
+            img_name = "{}_{}_{}.png".format(person_sid, perform_sid, 1)
+            img_url = img_folder + '/' + 'img_name'
+            if not os.path.isfile(img_url): 
+                break
+            url_list.append(img_url)
+
+        return url_list
+
+
