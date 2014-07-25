@@ -68,7 +68,7 @@ class Visualization:
 
         from dir_processing import DirProcessing
 
-        img_urls = DirProcessing.get_all_img_urls_from_sequence('79','1')
+        img_urls = DirProcessing.get_all_img_urls_from_sequence('79','2')
         print img_urls
         Visualization.draw_landmarks_on_sequence(img_urls)
 #        img_url = DirProcessing.generate_img_url('10','2','1')
