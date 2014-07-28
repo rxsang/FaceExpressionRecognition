@@ -54,7 +54,7 @@ class DirProcessing:
         return person_id, perform_id, index_id
         
     @staticmethod
-    def generate_labels_url_from_img_url(img_url):
+    def generate_label_url_from_img_url(img_url):
         person_id, perform_id, index_id = DirProcessing.get_id_from_img_url(img_url)
         label_url = DirProcessing.generate_label_url(person_id, perform_id, index_id)
 
@@ -86,4 +86,21 @@ class DirProcessing:
             index_id = index_id + 1
         return url_list
 
+    @staticmethod
+    def get_all_landmarks_urls_from_sequence(person_id, perform_id):
+        person_sid = 'S' + person_id.zfill(3)
+        perform_sid = perform_id.zfill(3)
+        
+        url_list = []
+        index_id = 1
+        while True:
+            index_sid = str(index_id).zfill(8)
+            landmarks_folder = "{}/{}/{}/{}".format(DirProcessing.dataset_root, DirProcessing.landmarks_folder, person_sid, perform_sid)
+            landmarks_name = "{}_{}_{}_landmarks.txt".format(person_sid, perform_sid, index_sid)
+            landmarks_url = landmarks_folder + '/' + landmarks_name
+            if not os.path.isfile(landmarks_url): 
+                break
+            url_list.append(landmarks_url)
+            index_id = index_id + 1
+        return url_list
 

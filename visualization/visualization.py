@@ -14,7 +14,7 @@ class Visualization:
         cv2.destroyAllWindows()
 
     @staticmethod
-    def draw_landmarks_on_img(img_url):
+    def draw_landmarks_on_img(img_url, drawtext=False):
         from dir_processing import DirProcessing
         landmarks_url = DirProcessing.generate_landmarks_url_from_img_url(img_url)
 
@@ -26,7 +26,10 @@ class Visualization:
             loc = landmarks[i, :]
             x = int(round(loc[0]))
             y = int(round(loc[1]))
-            cv2.circle(img, (x, y), 3, 255)
+            cv2.circle(img, (x, y), 2, 255)
+
+            if drawtext:
+                cv2.putText(img, str(i), (x,y), cv2.FONT_HERSHEY_SIMPLEX, 0.25, 255)
 
         cv2.imshow('image',img)
         cv2.waitKey(0)
@@ -68,11 +71,11 @@ class Visualization:
 
         from dir_processing import DirProcessing
 
-        img_urls = DirProcessing.get_all_img_urls_from_sequence('79','2')
-        print img_urls
-        Visualization.draw_landmarks_on_sequence(img_urls)
-#        img_url = DirProcessing.generate_img_url('10','2','1')
-#        Visualization.draw_landmarks_on_img(img_url)
+#        img_urls = DirProcessing.get_all_img_urls_from_sequence('79','2')
+#        print img_urls
+#        Visualization.draw_landmarks_on_sequence(img_urls)
+        img_url = DirProcessing.generate_img_url('87','4','4')
+        Visualization.draw_landmarks_on_img(img_url, True)
 
 ####################################3
     
