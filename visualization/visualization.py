@@ -58,8 +58,11 @@ class Visualization:
                 cv2.circle(img, (x, y), 1, 255)
             
             print img_url
-            cv2.imshow('image' + str(i), img)
-            cv2.waitKey(0)
+            cv2.imshow('image', img)
+
+            k = cv2.waitKey(0)
+            if k == 27:     # Esc key to stop
+                break
         
         cv2.destroyAllWindows()
                                                                                         
@@ -71,11 +74,11 @@ class Visualization:
 
         from dir_processing import DirProcessing
 
-#        img_urls = DirProcessing.get_all_img_urls_from_sequence('79','2')
-#        print img_urls
-#        Visualization.draw_landmarks_on_sequence(img_urls)
-        img_url = DirProcessing.generate_img_url('87','4','4')
-        Visualization.draw_landmarks_on_img(img_url, True)
+        img_urls = DirProcessing.get_all_img_urls_from_sequence('109','2')
+        print img_urls
+        Visualization.draw_landmarks_on_sequence(img_urls)
+#        img_url = DirProcessing.generate_img_url('109','2','1')
+#        Visualization.draw_landmarks_on_img(img_url, True)
 
 ####################################3
     

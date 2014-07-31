@@ -1,6 +1,7 @@
 from __future__ import with_statement
 import ConfigParser
 import os
+import re
 
 class DirProcessing:
     config = ConfigParser.ConfigParser()
@@ -52,7 +53,19 @@ class DirProcessing:
         index_id = img_name[9:17]
 
         return person_id, perform_id, index_id
-        
+    
+    @staticmethod
+    def get_id_from_landmarks_url(landmarks_url):
+        landmarks_name = os.path.basename(landmarks_url)
+        person_id = landmarks_name[1:4]
+        perform_id = landmarks_name[5:8]
+        index_id = landmarks_name[9:17]
+
+        return person_id, perform_id, index_id
+    
+
+
+
     @staticmethod
     def generate_label_url_from_img_url(img_url):
         person_id, perform_id, index_id = DirProcessing.get_id_from_img_url(img_url)
@@ -66,6 +79,23 @@ class DirProcessing:
         landmarks_url = DirProcessing.generate_landmarks_url(person_id, perform_id, index_id)
 
         return landmarks_url
+
+    @staticmethod
+    def generate_img_url_from_landmarks_url(landmarks_url):
+        person_id, perform_id, index_id = DirProcessing.get_id_from_landmarks_url(landmarks_url)
+        img_url = DirProcessing.generate_img_url(person_id, perform_id, index_id)
+
+        return img_url
+
+    @staticmethod
+    def generate_img_urls_from_landmarks_urls(landmarks_urls):
+        img_urls = []
+        for landmarks_url in landmarks_urls:
+            img_url = DirProcessing.generate_img_url_from_landmarks_url(landmarks_url)
+            img_urls.append(img_url)
+
+        return img_urls
+
 
     @staticmethod
     def get_all_img_urls_from_sequence(person_id, perform_id):
@@ -104,3 +134,27 @@ class DirProcessing:
             index_id = index_id + 1
         return url_list
 
+    @staticmethod
+    def get_all_person_ids():
+        root_img_folder = "{}/{}".format(DirProcessing.dataset_root, DirProcessing.image_folder)
+        files = os.listdir(root_img_folder)
+        person_ids = []
+
+        for f in files:
+            if re.match("S\d{3}", f):
+                person_ids.append(f[1:])
+
+        return person_ids
+
+    @staticmethod
+    def get_all_perform_ids_from_person_id(person_id):
+        person_sid = 'S' + person_id.zfill(3)
+        root_person_folder = "{}/{}/{}".format(DirProcessing.dataset_root, DirProcessing.image_folder, person_sid)
+        files = os.listdir(root_person_folder)
+        perform_ids = []
+
+        for f in files:
+            if re.match("\d{3}", f):
+                perform_ids.append(f)
+
+        return perform_ids

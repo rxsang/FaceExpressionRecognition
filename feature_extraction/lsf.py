@@ -32,8 +32,22 @@ class LSF:
     def build_dictionary():
         count = 0
         for i in xrange(0, LSF.keypoint_num):
+            
+            keypoint_sindex = str(i).zfill(2)
+            word = "P{}NEURAL".format(keypoint_sindex)
+            LSF.word2id[word] = count
+            LSF.id2word[count] = word
+            count = count + 1
+
             for j in xrange(0, LSF.direction_num):
-                for k in xrange(2, (LSF.radius_num + 1) * 2, 2):
+
+                direction_sindex = str(j).zfill(2)
+                word = "P{}D{}R99".format(keypoint_sindex, direction_sindex)
+                LSF.word2id[word] = count
+                LSF.id2word[count] = word
+                count = count + 1
+
+                for k in xrange(LSF.radius_interval, (LSF.radius_num + 1) * LSF.radius_interval, LSF.radius_interval):
                     word = LSF.generate_format_word(i, j, k)
                     LSF.word2id[word] = count
                     LSF.id2word[count] = word
@@ -113,6 +127,57 @@ class LSF:
         return word
 
     @staticmethod
+    def generate_corpus_and_write_to_file():
+        """ generate the copus, write it to files and store the LSF corpus features """
+        
+        import os
+        import sys
+        lib_path = os.path.abspath('../utilization/')
+        sys.path.append(lib_path)
+
+        from dir_processing import DirProcessing
+
+        LSF.build_dictionary()
+
+        lsf_corpus = []
+
+        person_ids = DirProcessing.get_all_person_ids()
+        for person_id in person_ids:
+            perform_ids = DirProcessing.get_all_perform_ids_from_person_id(person_id)
+            for perform_id in perform_ids:
+                landmarks_urls = DirProcessing.get_all_landmarks_urls_from_sequence(person_id, perform_id)
+                expression_sequence = LSF.lsf_from_sequence(landmarks_urls)
+                print 'The feature extraction of expression person S{} and perform time {} has ' \
+                        'been done.'.format(person_id, perform_id)
+                lsf_corpus.append(expression_sequence)
+
+        import cPickle
+        with open('../model/corpus.pk', 'wb') as f:
+            cPickle.dump(lsf_corpus, f)
+       
+        with open('../model/corpus.txt', 'w') as f:
+            for expression_sequence in lsf_corpus:
+                lsf_sequence = expression_sequence.lsf_sequence
+                for lsf_document in lsf_sequence:
+                    f.write(str(len(lsf_document)))
+                    for word, count in lsf_document.iteritems():
+                        wid = LSF.word2id[word]
+                        s = " %d:%d" %(wid, count)
+                        f.write(s)
+                    f.write("\n")
+    
+    @staticmethod
+    def write_vocab_to_file():
+        """ write the all the words to file """
+
+        with open('../model/vocab.txt', 'w')  as f:
+            for i in xrange(0, len(LSF.id2word)):
+                f.write(str(LSF.id2word[i]) + "\n")
+            
+
+
+    
+    @staticmethod
     def test():
         import os
         import sys
@@ -144,7 +209,14 @@ class LSF:
 #################################################
 
 if __name__ == '__main__':
-    LSF.test()
+#    LSF.generate_corpus_and_write_to_file()
+#    LSF.build_dictionary()
+#    LSF.write_vocab_to_file()
+
+    import cPickle
+    with open('../model/corpus.pk','rb') as f:
+        lsf_corpus = cPickle.load(f)
+        print 'succeed'
 
 
 
