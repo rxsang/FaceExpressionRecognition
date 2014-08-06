@@ -14,6 +14,11 @@ class FileOp:
         return landmarks
 
     @staticmethod
+    def read_label_file(label_url):
+        label = np.loadtxt(label_url)
+        return int(label)
+
+    @staticmethod
     def read_landmarks_sequence(landmarks_urls):
         """ get all landmarks from a sequence of landmarks urls """
         
@@ -31,9 +36,9 @@ class FileOp:
         lib_path = os.path.abspath('../utilization/')
         sys.path.append(lib_path)
         from dir_processing import DirProcessing
-        landmarks_url = DirProcessing.generate_landmarks_url('147','2','1')
-        landmarks = FileOp.read_landmarks_file(landmarks_url)
-        print landmarks[1,:]
+        label_url = DirProcessing.generate_label_url('34','3','27')
+        label = FileOp.read_label_file(label_url)
+        print label
 
 ##########################################3
 

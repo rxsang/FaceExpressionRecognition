@@ -46,26 +46,26 @@ class DirProcessing:
         return landmarks_url
 
     @staticmethod
-    def get_id_from_img_url(img_url):
-        img_name = os.path.basename(img_url)
-        person_id = img_name[1:4]
-        perform_id = img_name[5:8]
-        index_id = img_name[9:17]
+    def get_id_from_url(url):
+        name = os.path.basename(url)
+        person_id = name[1:4]
+        perform_id = name[5:8]
+        index_id = name[9:17]
 
         return person_id, perform_id, index_id
-    
+   
+    @staticmethod
+    def get_id_from_img_url(img_url):
+        return DirProcessing.get_id_from_url(img_url)
+
     @staticmethod
     def get_id_from_landmarks_url(landmarks_url):
-        landmarks_name = os.path.basename(landmarks_url)
-        person_id = landmarks_name[1:4]
-        perform_id = landmarks_name[5:8]
-        index_id = landmarks_name[9:17]
+        return DirProcessing.get_id_from_url(landmarks_url)
 
-        return person_id, perform_id, index_id
+    @staticmethod
+    def get_id_from_label_url(label_url):
+        return DirProcessing.get_id_from_url(label_url)
     
-
-
-
     @staticmethod
     def generate_label_url_from_img_url(img_url):
         person_id, perform_id, index_id = DirProcessing.get_id_from_img_url(img_url)
@@ -86,6 +86,13 @@ class DirProcessing:
         img_url = DirProcessing.generate_img_url(person_id, perform_id, index_id)
 
         return img_url
+
+    @staticmethod
+    def get_label_url_from_landmarks_url(landmarks_url):
+        person_id, perform_id, index_id = DirProcessing.get_id_from_landmarks_url(landmarks_url)
+        label_url = DirProcessing.get_label_url_from_sequence(person_id, perform_id)
+
+        return label_url
 
     @staticmethod
     def generate_img_urls_from_landmarks_urls(landmarks_urls):
@@ -134,6 +141,47 @@ class DirProcessing:
             index_id = index_id + 1
         return url_list
 
+    @staticmethod
+    def get_label_url_from_sequence(person_id, perform_id):
+        person_sid = 'S' + person_id.zfill(3)
+        perform_sid = perform_id.zfill(3)
+
+        root_sequence_folder = os.path.join(DirProcessing.dataset_root, DirProcessing.label_folder, person_sid, perform_sid)
+
+        if not os.path.exists(root_sequence_folder):
+            return None
+
+        f = os.listdir(root_sequence_folder)
+
+        if not f:
+            return None
+        else:
+            return os.path.join(root_sequence_folder, f[0])
+
+    @staticmethod
+    def get_location_from_sequence(landmarks_url, sel_num):
+        """ get the location of the landmarks url in the sequence, the fisrt url is taken
+        as the neural expression, return "START". The middle urls are discarded, return "MIDDLE". 
+        The last sel_num urls are taken as the expression for the sequence, return "LAST". """
+
+        person_id, perform_id, index_id = DirProcessing.get_id_from_landmarks_url(landmarks_url)
+
+        person_sid = 'S' + person_id.zfill(3)
+        perform_sid = perform_id.zfill(3)
+
+        root_sequence_folder = os.path.join(DirProcessing.dataset_root, DirProcessing.landmarks_folder, person_sid, perform_sid)
+        f = os.listdir(root_sequence_folder)
+
+        total_num = len(f)
+
+        if int(index_id) <= 1:
+            return "START"
+        elif int(index_id) > total_num - sel_num:
+            return "LAST"
+        else:
+            return "MIDDLE"
+        
+        
     @staticmethod
     def get_all_person_ids():
         root_img_folder = "{}/{}".format(DirProcessing.dataset_root, DirProcessing.image_folder)

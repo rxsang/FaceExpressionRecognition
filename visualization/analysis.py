@@ -8,7 +8,9 @@ class Analysis:
 
     @staticmethod
     def get_topic_proportions_for_every_image():
-        
+       
+        from dir_processing import DirProcessing
+
         landmarks_urls_list = []
 
         person_ids = DirProcessing.get_all_person_ids()
@@ -23,7 +25,6 @@ class Analysis:
         dt_file = '../ctm-dist/CTM46/final-lambda.dat'
         dt_vector = np.loadtxt(dt_file)
         topic_num = dt_vector.size / doc_num
-        print dt_vector.size, doc_num, topic_num
         dt_matrix = np.reshape(dt_vector, (doc_num, topic_num)) 
         np.set_printoptions(suppress=True)
 
@@ -36,7 +37,7 @@ class Analysis:
     def cluster_topic_propotions(final_theta):
 
         import scipy.cluster
-        centroid, label = scipy.cluster.vq.kmeans2(final_theta, 6, 100, minit='points')
+        centroid, label = scipy.cluster.vq.kmeans2(final_theta, 6, 1000, minit='points')
 
         return centroid, label
 
@@ -49,6 +50,8 @@ class Analysis:
 
         sample_list = np.where(label == cluster_index)[0]
         sample_list = np.random.permutation(sample_list)
+
+        print len(sample_list)
        
         landmarks_urls_sublist = []
         for i in sample_list:
@@ -65,7 +68,7 @@ class Analysis:
         lib_path = os.path.abspath('../utilization/')
         sys.path.append(lib_path)
 
-        clustered = True
+        clustered = True 
 
         if not clustered:
             landmarks_urls_list, final_theta = Analysis.get_topic_proportions_for_every_image()
@@ -81,7 +84,7 @@ class Analysis:
             with open('../model/kmeans_results.pk', 'rb') as f:
                 landmarks_urls_list, centroid, label = cPickle.load(f)
 
-            Analysis.random_show_cluster(landmarks_urls_list, label, 4)
+            Analysis.random_show_cluster(landmarks_urls_list, label, 2)
 
 ##############################################################
 
